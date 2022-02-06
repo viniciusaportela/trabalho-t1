@@ -17,13 +17,12 @@ class UserView:
             if (option >= 0 and option <= 6):
                 return option
 
-    def show_attach_covid_status(self):
-        pass
-
-    def show_register_user(self):
-        print('-= Cadastrar Pessoa =-')
+    def show_register_user(self, edit_mode = False):
+        print('-= Editar Pessoa =-' if edit_mode else '-= Cadastrar Pessoa =-')
         name = input('Nome: ')
-        cpf = input('CPF: ')
+        cpf = None
+        if (not edit_mode):
+            cpf = input('CPF: ')
         birthday_raw = input('Data Nascimento (dia/mes/ano): ')
         birthday_raw_split = birthday_raw.split("/")
         birthday = datetime(
@@ -43,7 +42,13 @@ class UserView:
         pass
 
     def show_find_user(self):
-        pass
+        print('-= Procurar Pessoa =-')
+        user_cpf = input('Digite o CPF ou 0 para sair: ')
+
+        if (user_cpf == '0'):
+            return None
+
+        return user_cpf
     
     def show_user_list(self, users):
         pass
@@ -54,8 +59,10 @@ class UserView:
     def show_select_user_menu(self, users):
         pass
 
-    def show_participant_register(self):
-        has_covid_proof = input("Tem alguma comprovacao contra covid (s/n)? ").lower() == 's'
+    def show_participant_register(self, skip_first_ask = False):
+        has_covid_proof = True
+        if (not skip_first_ask):
+            has_covid_proof = input("Tem alguma comprovacao contra covid (s/n)? ").lower() == 's'
 
         if not has_covid_proof:
             return { "has_two_vaccines": None, "has_covid": None, "pcr_exam_date": None }
