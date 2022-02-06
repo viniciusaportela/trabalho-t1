@@ -1,14 +1,14 @@
+import controllers.users_controller
+
 class ControllersManager:
     def __init__(self):
-        self.__user_controller = UserController()
-        self.__participant_controller = ParicipantController()
+        self.__users_controller = controllers.users_controller.UsersController(self)
 
         self.controllers_bindings = {
-            'user': self.__user_controller,
-            'participant': self.__participant_controller
+            'user': self.__users_controller,
         }
 
     def get(self, name):
         return self.controllers_bindings[name]
 
-controllersManager = ControllersManager()
+controllers_manager = ControllersManager()
