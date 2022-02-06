@@ -17,11 +17,11 @@ class UsersController:
                 return user
         return None
 
-    def add_user(self, cpf, name, birthday, cep, street, number, complement, has_two_vacines, has_covid, pcr_exam_date):
+    def add_user(self, cpf, name, birthday, cep, street, number, complement, has_two_vaccines, has_covid, pcr_exam_date):
         user = None
-        is_participant = has_two_vacines != None and has_covid != None and pcr_exam_date != None
+        is_participant = has_two_vaccines != None and has_covid != None and pcr_exam_date != None
         if (is_participant):
-            user = Participant(cpf, name, birthday, cep, street, number, complement, has_two_vacines, has_covid, pcr_exam_date)
+            user = Participant(cpf, name, birthday, cep, street, number, complement, has_two_vaccines, has_covid, pcr_exam_date)
         else:
             user = Person(cpf, name, birthday, cep, street, number, complement)
         
@@ -54,7 +54,7 @@ class UsersController:
 
     def open_user_menu(self):
         bindings = {
-            1: self.view.show_register_user,
+            1: self.open_register_user,
             2: self.view.show_attach_covid_status,
             3: self.view.show_edit_user,
             4: self.view.show_delete_user,
@@ -62,12 +62,32 @@ class UsersController:
             6: self.view.show_find_user
         }
 
-        option = self.view.open_users_menu()
+        option = None
+        while option != 0:
+            option = self.view.open_users_menu()
+            bindings[option]()
 
-        if (option == 0):
-            return
-        
-        bindings[option]()
+    def open_register_user(self):
+        user_data = self.view.show_register_user()
+        address_data = self.controllers_manager.get('address').view.view_register_address()
+        participant_data = self.view.show_participant_register()
+
+        has_two_vaccines = participant_data["has_two_vaccines"]
+
+        self.add_user(
+            user_data["cpf"],
+            user_data["name"],
+            user_data["birthday"],
+            address_data["cep"],
+            address_data["street"],
+            address_data["number"],
+            address_data["complement"],
+            has_two_vaccines,
+            participant_data["has_covid"],
+            participant_data["pcr_exam_date"],
+        )
+
+        print('Usuario adicionado!')
 
     def open_set_covid_status():
         pass

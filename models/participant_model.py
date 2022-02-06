@@ -2,10 +2,10 @@ from models.person_model import Person
 from models.pcr_exam_model import PCRExam
 
 class Participant(Person):
-    def __init__(self, person, has_two_vacines, has_covid, pcr_exam_date):
+    def __init__(self, person, has_two_vaccines, has_covid, pcr_exam_date):
         super().__init__(person.cpf, person.name, person.birthday, person.cep, person.street, person.number, person.complement)
         self.__pcr_exam = PCRExam(has_covid, pcr_exam_date)
-        self.__has_two_vaccines = has_two_vacines
+        self.__has_two_vaccines = has_two_vaccines
 
     @property
     def pcr_exam(self):

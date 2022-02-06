@@ -1,8 +1,11 @@
+from datetime import datetime
+
+
 class UserView:
     def open_users_menu(self):
         valid_option = False
         while not valid_option:
-            print('-= Menu Pessoa =-')
+            print('-= Menu Pessoas =-')
             print('1 - Cadastrar Pessoa')
             print('2 - Anexar comprovacao covid')
             print('3 - Editar pessoa')
@@ -18,7 +21,17 @@ class UserView:
         pass
 
     def show_register_user(self):
-        pass
+        print('-= Cadastrar Pessoa =-')
+        name = input('Nome: ')
+        cpf = input('CPF: ')
+        birthday_raw = input('Data Nascimento (dia/mes/ano): ')
+        birthday_raw_split = birthday_raw.split("/")
+        birthday = datetime(
+            int(birthday_raw_split[2]),
+            int(birthday_raw_split[1]),
+            int(birthday_raw_split[0])
+        )
+        return { "name": name, "cpf": cpf, "birthday": birthday }
 
     def show_edit_user(self):
         pass
@@ -40,3 +53,32 @@ class UserView:
 
     def show_select_user_menu(self, users):
         pass
+
+    def show_participant_register(self):
+        has_covid_proof = input("Tem alguma comprovacao contra covid (s/n)? ").lower() == 's'
+
+        if not has_covid_proof:
+            return { "has_two_vaccines": None, "has_covid": None, "pcr_exam_date": None }
+
+        has_two_vaccines = input('Tomou duas doses (s/n)? ') == 's'
+
+        if (has_two_vaccines):
+            return { "has_two_vaccines": has_two_vaccines, "has_covid": None, "pcr_exam_date": None }
+        
+        has_pcr_test = input('Fez um teste PCR (s/n)? ') == 's'
+
+        if (not has_pcr_test):
+            return { "has_two_vaccines": None, "has_covid": None, "pcr_exam_date": None }
+
+        has_covid = input('Qual resultado do exame? (positivo/negativo)') == 'positivo'
+        pcr_exam_date_raw = input('Qual foi a data do exame (dia/mes/ano)? ')
+        pcr_exam_date_raw_splitted = pcr_exam_date_raw.split("/")
+        pcr_exam_date = datetime(
+            int(pcr_exam_date_raw_splitted[2]),
+            int(pcr_exam_date_raw_splitted[1]),
+            int(pcr_exam_date_raw_splitted[0])
+        )
+
+        return { "has_two_vaccines": False, "has_covid": has_covid, "pcr_exam_date": pcr_exam_date }
+        
+        
