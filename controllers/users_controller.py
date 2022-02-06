@@ -19,7 +19,10 @@ class UsersController:
         return None, -1
 
     def add_user(self, cpf, name, birthday, cep, street, number, complement, has_two_vaccines = None, has_covid = None, pcr_exam_date = None):
-        # TODO Not duplicated CPF
+        already_has_user = self.get_user_by_cpf(cpf)
+
+        if (already_has_user):
+            return False, 'Esse usuario ja existe!'
 
         user = None
         is_participant = has_two_vaccines != None or (has_covid != None and pcr_exam_date != None)
@@ -29,6 +32,8 @@ class UsersController:
             user = Person(cpf, name, birthday, cep, street, number, complement)
         
         self.__users.append(user)
+
+        return True, ''
 
     def edit_user(self, cpf, name, birthday, cep, street, number, complement):
         user, index = self.get_user_by_cpf(cpf)
