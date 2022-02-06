@@ -71,7 +71,7 @@ class UsersController:
             1: self.open_register_user,
             2: self.open_register_participant,
             3: self.open_edit_user,
-            4: self.open_delete_user,
+            4: self.open_remove_user,
             5: self.open_user_list,
             6: self.open_find_user
         }
@@ -142,15 +142,26 @@ class UsersController:
         )
 
         print('Usuario Editado!')
-    
-    def open_delete_user():
-        pass
 
-    def open_user_list():
-        pass
+    def open_remove_user(self):
+        user = self.__open_select_user()
+        if (user == None):
+            return
 
-    def open_find_user():
-        pass
+        self.remove_user(user.cpf)
+
+        print('Usuario deletado!')
+
+    def open_user_list(self):
+        users = self.get_users()
+        self.view.show_user_list(users)
+
+    def open_find_user(self):
+        user = self.__open_select_user()
+        if (user == None):
+            return
+        
+        self.view.show_user_details(user)
 
     def __open_select_user(self):
         user = None

@@ -1,3 +1,4 @@
+from datetime import datetime
 from controllers.controllers_manager import controllers_manager
 from views.main_view import MainView
 
@@ -6,8 +7,8 @@ class App:
         self.view = MainView()
 
     def __inject_data(self):
-        controllers_manager.user.add_user('123', 'Vini', '04/07/2001', '123', 'a', 'b', 'test')
-        controllers_manager.user.add_user('1234', 'Vini2', '04/07/2001', '123', 'a', 'b', 'test', True)
+        controllers_manager.user.add_user('123', 'Vini', datetime(2001, 7, 4), '123', 'a', 'b', 'test')
+        controllers_manager.user.add_user('1234', 'Vini2', datetime(2001, 7, 4), '123', 'a', 'b', 'test', True)
 
     def run(self):
         self.__inject_data()

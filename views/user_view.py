@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from models.participant_model import Participant
+
 
 class UserView:
     def open_users_menu(self):
@@ -49,15 +51,25 @@ class UserView:
             return None
 
         return user_cpf
-    
+
     def show_user_list(self, users):
-        pass
+        print('-= Lista de Usuarios =-')
+        for index, user in enumerate(users):
+            print(str(index + 1) + ' - ' + user.name + ' (' + user.cpf + ')')
+        input('Aperte enter para sair... ')
 
     def show_user_details(self, user):
-        pass
+        print('-= Usuario =-')
+        print('Nome: ' + user.name)
+        print('CPF: ' + user.cpf)
+        print('Aniversario: ' + user.birthday.strftime("%d/%m/%Y"))
+        print('Endereco: ' + user.address.cep + ', ' + user.address.street + ', ' + user.address.number + ', ' + user.address.complement)
 
-    def show_select_user_menu(self, users):
-        pass
+        if (isinstance(user, Participant)):
+            print('Tomou duas doses: ' + ('sim' if user.has_two_vaccines else 'nao'))
+            print('Exame PCR: ' + ('positivo' if user.pcr_exam.has_covid else 'negativo'))
+        
+        input('Aperte enter para sair... ')
 
     def show_participant_register(self, skip_first_ask = False):
         has_covid_proof = True
@@ -77,7 +89,7 @@ class UserView:
         if (not has_pcr_test):
             return { "has_two_vaccines": None, "has_covid": None, "pcr_exam_date": None }
 
-        has_covid = input('Qual resultado do exame? (positivo/negativo)') == 'positivo'
+        has_covid = input('Qual resultado do exame(positivo/negativo)? ') == 'positivo'
         pcr_exam_date_raw = input('Qual foi a data do exame (dia/mes/ano)? ')
         pcr_exam_date_raw_splitted = pcr_exam_date_raw.split("/")
         pcr_exam_date = datetime(
