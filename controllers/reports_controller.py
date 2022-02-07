@@ -14,7 +14,7 @@ class ReportsController:
         }
 
         while True:
-            option = self.view.view_reports_menu()
+            option = self.view.show_reports_menu()
 
             if (option == 0):
                 return

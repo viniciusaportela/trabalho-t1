@@ -1,5 +1,5 @@
 class EventsView:
-    def view_events_menu():
+    def show_events_menu(self):
         print('-= Eventos =-')
         print('1 - Cadastrar evento')
         print('2 - Editar evento')
@@ -16,3 +16,9 @@ class EventsView:
                 return option
             else:
                 print('Escolha uma opcao valida!')
+    
+    def show_register_event(self):
+        print('-= Registrar Evento =-')
+        name = input('Nome: ')
+
+        return { "name": name }

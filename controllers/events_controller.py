@@ -17,33 +17,40 @@ class EventsController:
                 return event, index
         return None, -1
 
-    def add_event(self, title, ):
+    def add_event(self, title, max_participants, local, datetime, organizers):
         already_has_event = self.get_event_by_title(title)
 
         if (already_has_event):
             return False, 'Esse evento ja existe!'
 
-        event = Event(title, )
-        
-        self.__users.append(user)
+        event = Event(title, max_participants, [], local, datetime, organizers)
+
+        self.__events.append(event)
 
         return True, ''
 
     def open_events_menu(self):
         bindings = {
-            1: self.open_soon_events,
+            1: self.open_register_event,
+            2: self.open_edit_event,
+            3: self.open_add_participant_to_event,
+            4: self.open_delete_event,
+            5: self.open_list_events,
+            6: self.open_find_event
         }
 
         while True:
-            option = self.view.view_events_menu()
+            option = self.view.show_events_menu()
 
             if (option == 0):
                 return
 
             bindings[option]()
-    
+
     def open_register_event(self):
-        pass
+        event_data = self.view.show_register_event()
+        organizer = self.__controllers_manager.user.view.show_find_user()
+        local = self.__controllers_manager
     
     def open_event_menu(self, event):
         pass

@@ -1,8 +1,8 @@
 class AddressView:
-    def view_register_address(self):
+    def show_register_address(self):
         cep = input('CEP: ')
         street = input('Rua: ')
-        number = int(input('Numero: '))
+        number = input('Numero: ')
         complement = input('Complemento: ')
 
         return { 

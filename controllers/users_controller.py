@@ -92,7 +92,7 @@ class UsersController:
 
     def open_register_user(self):
         user_data = self.view.show_register_user()
-        address_data = self.__controllers_manager.address.view.view_register_address()
+        address_data = self.__controllers_manager.address.view.show_register_address()
         participant_data = self.view.show_participant_register()
 
         has_two_vaccines = "has_two_vaccines" in participant_data and participant_data["has_two_vaccines"]
@@ -135,7 +135,7 @@ class UsersController:
             return
 
         user_data = self.view.show_register_user(True)
-        address_data = self.__controllers_manager.address.view.view_register_address()
+        address_data = self.__controllers_manager.address.view.show_register_address()
         self.edit_user(
             user.cpf,
             user_data["name"],

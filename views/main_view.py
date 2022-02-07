@@ -1,9 +1,10 @@
 class MainView:
-    def view_menu(self):
+    def show_menu(self):
         print('-= Menu =-')
         print('1 - Pessoas')
         print('2 - Eventos')
-        print('3 - Relatorios')
+        print('3 - Locais')
+        print('4 - Relatorios')
         print('0 - Sair')
         
         while True:

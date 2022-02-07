@@ -1,12 +1,10 @@
 from datetime import datetime
-
 from models.participant_model import Participant
 
 
 class UserView:
     def open_users_menu(self):
-        valid_option = False
-        while not valid_option:
+        while True:
             print('-= Menu Pessoas =-')
             print('1 - Cadastrar Pessoa')
             print('2 - Anexar comprovacao covid')
@@ -34,15 +32,6 @@ class UserView:
         )
         return { "name": name, "cpf": cpf, "birthday": birthday }
 
-    def show_edit_user(self):
-        pass
-
-    def show_edit_user_menu(self):
-        pass
-
-    def show_delete_user(self, user):
-        pass
-
     def show_find_user(self):
         print('-= Procurar Pessoa =-')
         user_cpf = input('Digite o CPF ou 0 para sair: ')
@@ -63,7 +52,7 @@ class UserView:
         print('Nome: ' + user.name)
         print('CPF: ' + user.cpf)
         print('Aniversario: ' + user.birthday.strftime("%d/%m/%Y"))
-        print('Endereco: ' + user.address.cep + ', ' + user.address.street + ', ' + user.address.number + ', ' + user.address.complement)
+        print('Endereco: ' + user.address.cep + ', ' + user.address.street + ', n. ' + user.address.number + ', ' + user.address.complement)
 
         if (isinstance(user, Participant)):
             print('Tomou duas doses: ' + ('sim' if user.has_two_vaccines else 'nao'))
