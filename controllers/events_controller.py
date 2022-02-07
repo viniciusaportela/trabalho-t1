@@ -114,11 +114,12 @@ class EventsController:
         print('Evento editado!')
 
     def open_add_participant_to_event(self, event):
-        print('-= Cadastrar pessoa em evento =-')
+        # TODO can't register if already is finished
+        print('-----------= Cadastrar pessoa em evento =-----------')
         user = self.__controllers_manager.user.open_select_user()
         if (user == None):
             return
-        
+
         if (not isinstance(user, Participant)):
             self.__controllers_manager.user.set_covid_status(user.cpf, False, None, None)
 
@@ -173,7 +174,12 @@ class EventsController:
             bindings[option](event)
 
     def open_participants_list(self, event):
-        self.view.show_participants_list(event.participants)
+        participants = []
+
+        for participant_assoc in event.participants:
+            participants.append(participant_assoc.participant)
+
+        self.view.show_participants_list(participants)
 
     def edit_participant(self, event, participant_cpf, time_entrance = None, time_leave = None):
         for index, participant_assoc in enumerate(event.participants):
@@ -194,9 +200,9 @@ class EventsController:
                 isinstance(participant, Participant) and 
                 (participant.has_two_vaccines or (participant.pcr_exam.date and not participant.pcr_exam.has_covid))
             ):
-                participants_with_covid_proof.append(participant_assoc)
+                participants_with_covid_proof.append(participant)
         
-        self.view.show_participants_list(participants_with_covid_proof, '-= Participantes com comprovacao Covid =-')
+        self.view.show_participants_list(participants_with_covid_proof, '-----------= Participantes com comprovacao Covid =-----------')
 
     def open_participants_without_covid_proof(self, event):
         participants = event.participants
@@ -208,10 +214,10 @@ class EventsController:
             ):
                 participants_without_covid_proof.append(participant)
         
-        self.view.show_participants_list(participants_without_covid_proof, '-= Participantes sem comprovacao Covid =-')
+        self.view.show_participants_list(participants_without_covid_proof, '-----------= Participantes sem comprovacao Covid =-----------')
 
     def open_register_entrance(self, event):
-        print('-= Cadastrar Entrada =-')
+        print('-----------= Cadastrar Entrada =-----------')
         # TODO after event date
         # TODO Cant do twice
         # TODO Has to verify if user is in event participants list
@@ -226,11 +232,11 @@ class EventsController:
         self.edit_participant(event, user.cpf, entrance_date)
 
     def open_register_leave(self, event):
-        # TODO after event date
+        # TODO after register_entrance
         # TODO Cant do twice
         # TODO Has to verify if user is in event participants list
         # TODO Verify if user has covid test
-        print('-= Cadastrar Saida =-')
+        print('-----------= Cadastrar Saida =-----------')
         user = self.__controllers_manager.user.open_select_user()
         if (user == None):
             return
@@ -241,11 +247,10 @@ class EventsController:
         self.edit_participant(event, user.cpf, None, leave_date)
 
     def update_user_reference(self, user):
-        # TODO Test
         for event_index, event in enumerate(self.__events):
-            for participant_index, participant in enumerate(event.participants):
-                if (participant.cpf == user.cpf):
-                    self.__events[event_index].participants[participant_index] = user
+            for participant_index, participant_assoc in enumerate(event.participants):
+                if (participant_assoc.participant.cpf == user.cpf):
+                    self.__events[event_index].participants[participant_index].participant = user
 
     def open_select_event(self):
         while True:

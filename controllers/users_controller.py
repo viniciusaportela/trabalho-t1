@@ -5,9 +5,9 @@ from models.person_model import Person
 
 class UsersController:
     def __init__(self, controllers_manager):
-        self.view = UserView()
         self.__users = []
         self.__controllers_manager = controllers_manager
+        self.view = UserView()
 
     def get_users(self):
         return self.__users

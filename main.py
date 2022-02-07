@@ -1,7 +1,10 @@
 from datetime import datetime
+import traceback
 from controllers.controllers_manager import controllers_manager
 from views.main_view import MainView
 
+# TODO Change to false
+DEBUG_MODE = True
 
 class App:
     def __init__(self):
@@ -18,21 +21,29 @@ class App:
         controllers_manager.event.add_event('E2', 10, local, '22/02/2022 17:30', [organizer])
 
     def run(self):
-        self.__inject_data()
+        try:
+            self.__inject_data()
 
-        bindings = {
-            1: controllers_manager.user.open_user_menu,
-            2: controllers_manager.event.open_events_menu,
-            3: controllers_manager.local.open_locals_menu,
-            4: controllers_manager.report.open_reports_menu,
-        }
+            bindings = {
+                1: controllers_manager.user.open_user_menu,
+                2: controllers_manager.event.open_events_menu,
+                3: controllers_manager.local.open_locals_menu,
+                4: controllers_manager.report.open_reports_menu,
+            }
 
-        while True:
-            option = self.view.show_menu()
+            while True:
+                option = self.view.show_menu()
 
-            if (option == 0):
-                return
+                if (option == 0):
+                    return
 
-            bindings[option]()
+                bindings[option]()
+        except Exception:
+            print('An unexpected error happened ...')
+            if (DEBUG_MODE):
+                print('=====================')
+                traceback.print_exc()
+                print('=====================')
+            self.run()
 
 App().run()

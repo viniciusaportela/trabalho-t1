@@ -1,20 +1,24 @@
 class ReportsView:
     def show_reports_menu(self):
         while True:
-            print('-= Menu Relatorios =-')
+            print('-----------= Menu Relatorios =-----------')
             print('1 - Eventos a realizar')
             print('2 - Ranking de eventos por numero de participantes')
             print('3 - Eventos ja realizados')
             print('0 - Voltar')
+            
             option = int(input('Por favor insira uma opcao: '))
+            
             if (option >= 0 and option <= 3):
                 return option
+            else:
+                print('Escolha uma opcao valida!')
 
     def show_report_events(self, events, header = None, with_participants = None):
         if (header):
             print(header)
         else:
-            print('-= Eventos =-')
+            print('-----------= Eventos =-----------')
 
         for index, event in enumerate(events):
             print(
