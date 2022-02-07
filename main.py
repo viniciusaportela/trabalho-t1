@@ -3,7 +3,6 @@ import traceback
 from controllers.controllers_manager import controllers_manager
 from views.main_view import MainView
 
-# TODO Change to false
 DEBUG_MODE = True
 
 class App:
@@ -19,6 +18,7 @@ class App:
         organizer, _ = controllers_manager.user.get_user_by_cpf('123')
         controllers_manager.event.add_event('E', 25, local, '01/01/2020 17:30', [organizer])
         controllers_manager.event.add_event('E2', 10, local, '22/02/2022 17:30', [organizer])
+        controllers_manager.event.add_event('E3', 10, local, '22/04/2022 17:30', [organizer])
 
     def run(self):
         try:

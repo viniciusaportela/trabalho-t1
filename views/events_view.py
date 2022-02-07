@@ -1,3 +1,7 @@
+from utils.date_validator import validate_datetime, validate_time
+from utils.recurring_ask import recurring_ask
+
+
 class EventsView:
     def show_events_menu(self):
         while True:
@@ -9,21 +13,34 @@ class EventsView:
             print('5 - Procurar evento / Manipular evento')
             print('0 - Voltar')
 
-            option = int(input('Selecione uma das opcoes: '))
+            option = int(input('Selecione uma das opcoes: ') or '-1')
 
             if (option >= 0 and option <= 5):
                 return option
             else:
                 print('Escolha uma opcao valida!')
-    
+
     def show_register_event(self):
         print('-----------= Registrar Evento =-----------')
         name = input('Nome: ')
-        max_participants = int(input('Max Participantes: '))
-        datetime_raw = input('Data e Hora (dia/mes/ano hora:minuto): ')
+        
+        def ask_max_participants():
+            max_participants = input('Max Participantes: ')
+            if (not max_participants.isnumeric()):
+                return None
+            return int(max_participants)
+        max_participants = recurring_ask(ask_max_participants)
+        
+        def ask_datetime():
+            datetime_raw = input('Data e Hora (dia/mes/ano hora:minuto): ')
+            is_date_valid = validate_datetime(datetime_raw)
+            if (not is_date_valid):
+                return None
+            return datetime_raw
+        datetime_raw = recurring_ask(ask_datetime)
 
         return { "name": name, "max_participants": max_participants, "event_date": datetime_raw }
-    
+
     def show_events_list(self, events):
         print('-----------= Eventos =-----------')
 
@@ -49,7 +66,7 @@ class EventsView:
             print('6 - Registrar saida')
             print('0 - Sair')
 
-            option = int(input('Selecione uma das opcoes: '))
+            option = int(input('Selecione uma das opcoes: ') or '-1')
 
             if (option >= 0 and option <= 6):
                 return option
@@ -66,19 +83,43 @@ class EventsView:
 
         return local_name
     
-    def show_participants_list(self, participants, custom_header = None):
+    def show_participants_list(self, participants_assoc, custom_header = None):
         if (custom_header):
             print(custom_header)
         else:
             print('-----------= Participantes =-----------')
 
-        for index, participant in enumerate(participants):
-            print(str(index + 1) + ' - ' + participant.name + ' (' + participant.cpf + ')')
+        for index, participant_assoc in enumerate(participants_assoc):
+            participant = participant_assoc.participant
+
+            def get_date_formatted(datetime):
+                if (datetime):
+                    return datetime.strftime('%H:%M')
+                else:
+                    return ''
+
+            print(
+                str(index + 1) + 
+                ' - ' + 
+                participant.name + 
+                ' (' + 
+                participant.cpf + 
+                ')' + 
+                (
+                    ('( ' + get_date_formatted(participant_assoc.time_entrance) + ' -> ' + get_date_formatted(participant_assoc.time_leave)) if (participants_assoc.time_entrance or participants_assoc.time_leave) else ''
+                )
+            )
         
         input('Aperte enter para sair... ')
 
     def get_hour(self):
-        date_raw = input('Horario de Entrada (H:m): ')
+        def ask_hour():
+            date_raw = input('Horario de Entrada (H:m): ')
+            is_date_valid = validate_time(date_raw)
+            if (not is_date_valid):
+                return None
+            return date_raw
+        date_raw = recurring_ask(ask_hour)
         date_raw_split = date_raw.split(':')
 
         hour = int(date_raw_split[0])

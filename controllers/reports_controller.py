@@ -23,7 +23,6 @@ class ReportsController:
             bindings[option]()
     
     def open_soon_events(self):
-        # TODO order by date
         events = self.__controllers_manager.event.get_events()
 
         soon_events = []
@@ -31,18 +30,19 @@ class ReportsController:
             current = datetime.now()
             if (event.datetime > current):
                 soon_events.append(event)
+        
+        soon_events_sorted = self.__sort_events_by_date(soon_events, False)
 
-        self.view.show_report_events(soon_events, '-----------= Proximos Eventos =-----------')
+        self.view.show_report_events(soon_events_sorted, '-----------= Proximos Eventos =-----------')
 
     def open_events_ranking_by_participants(self):
         events = self.__controllers_manager.event.get_events()
 
-        events_sorted = self.__sort_events(events)    
+        events_sorted = self.__sort_events_by_participants_count(events)    
 
         self.view.show_report_events(events_sorted, '-----------= Ranking por participantes =-----------', True)
 
     def open_past_events(self):
-        # TODO order by date
         events = self.__controllers_manager.event.get_events()
         
         past_events = []
@@ -51,10 +51,18 @@ class ReportsController:
             if (event.datetime <= current):
                 past_events.append(event)
 
-        self.view.show_report_events(past_events, '-----------= Ultimos Eventos =-----------')
+        past_events_sorted = self.__sort_events_by_date(past_events)
 
-    def __sort_events(self, events):
+        self.view.show_report_events(past_events_sorted, '-----------= Ultimos Eventos =-----------')
+
+    def __sort_events_by_participants_count(self, events):
         def sort_func(event):
             return len(event.participants)
 
         return sorted(events, key=sort_func, reverse=True)
+    
+    def __sort_events_by_date(self, events, reverse = True):
+        def sort_func(event):
+            return event.datetime
+
+        return sorted(events, key=sort_func, reverse=reverse)

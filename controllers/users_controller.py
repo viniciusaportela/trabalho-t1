@@ -1,3 +1,4 @@
+from datetime import datetime
 from views.user_view import UserView
 from models.participant_model import Participant
 from models.person_model import Person
@@ -71,6 +72,18 @@ class UsersController:
         self.__users[index] = participant
         self.__controllers_manager.event.update_user_reference(participant)
 
+    def can_participante_event(self, cpf):
+        user = self.get_user_by_cpf(cpf)
+        is_participant = isinstance(user, Participant)
+        
+        if (not is_participant):
+            return False
+        
+        if (not user.has_two_vaccines and (not user.pcr_exam.date or user.pcr_exam.has_covid)):
+            return False
+        
+        return True
+
     def open_user_menu(self):
         bindings = {
             1: self.open_register_user,
@@ -99,6 +112,11 @@ class UsersController:
         has_covid = "has_covid" in participant_data and participant_data['has_covid']
         pcr_exam_date = "pcr_exam_date" in participant_data and participant_data["pcr_exam_date"]
 
+        current = datetime.now()
+        if (current.year - user_data["birthday"].year > 150):
+            print('O usuario nao pode ter mais que 150 anos!')
+            return
+
         self.add_user(
             user_data["cpf"],
             user_data["name"],
@@ -120,6 +138,7 @@ class UsersController:
             return
 
         participant_data = self.view.show_participant_register(True)
+        
         self.set_covid_status(
             user.cpf,
             participant_data['has_two_vaccines'],

@@ -7,7 +7,7 @@ class ReportsView:
             print('3 - Eventos ja realizados')
             print('0 - Voltar')
             
-            option = int(input('Por favor insira uma opcao: '))
+            option = int(input('Por favor insira uma opcao: ') or '-1')
             
             if (option >= 0 and option <= 3):
                 return option
@@ -28,6 +28,8 @@ class ReportsView:
                 ' (' + 
                 event.local.name +
                 ')' +
+                ' - ' +
+                event.datetime.strftime('%d/%m/%Y %H:%M') +
                 ((' - ' + str(len(event.participants)) + ' participantes') if with_participants else '')
             )
         
