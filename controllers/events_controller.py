@@ -118,7 +118,7 @@ class EventsController:
             event.participants,
             local,
             event_data["event_date"],
-            [organizer]
+            organizers
         )
 
         print('Evento editado!')
@@ -243,7 +243,7 @@ class EventsController:
             print('Esse usuario nao esta cadastrado nesse evento!')
             return
         
-        already_register_entrance = self.__already_register_hour(user, event, 'entrance')
+        already_register_entrance = self.__already_register_hour_entrance(user, event)
         if (already_register_entrance):
             print('Esse usuario ja esta no evento!')
             return
@@ -286,19 +286,19 @@ class EventsController:
             print('Esse usuario nao esta cadastrado nesse evento!')
             return
 
-        register_entrance = self.__already_register_hour(user, event, 'entrance')
+        register_entrance = self.__already_register_hour_entrance(user, event)
         if (not register_entrance):
             print('Esse usuario nao entrou no evento para sair!')
             return
         
-        already_register_leave = self.__already_register_hour(user, event, 'leave')
+        already_register_leave = self.__already_register_hour_leave(user, event)
         if (already_register_leave):
             print('Esse usuario ja saiu do evento!')
             return
         
         valid_hour = False
         leave_date = None
-        entrance_hour = self.__get_participant_assoc_hour(user, event, 'entrance')
+        entrance_hour = self.__get_participant_assoc_hour_entrance(user, event)
         while not valid_hour:
             leave_hour, leave_minute = self.view.get_hour()
             leave_date = datetime(event.datetime.year, event.datetime.month, event.datetime.day, leave_hour, leave_minute)
@@ -310,22 +310,28 @@ class EventsController:
         
         self.edit_participant(event, user.cpf, None, leave_date)
 
-    def __user_is_in_event(user, event):
+    def __user_is_in_event(self, user, event):
         for participant_assoc in event.participants:
             if (participant_assoc.participant.cpf == user.cpf):
                 return True
         return False
 
-    def __get_participant_assoc_hour(user, event, key):
+    def __get_participant_assoc_hour_entrance(self, user, event):
         for participant_assoc in event.participants:
             if (participant_assoc.participant.cpf == user.cpf):
-                return participant_assoc['time_' + key]
+                return participant_assoc.time_entrance
         return False
 
-    def __already_register_hour(user, event, key):
+    def __already_register_hour_entrance(self, user, event):
         for participant_assoc in event.participants:
             if (participant_assoc.participant.cpf == user.cpf):
-                return bool(participant_assoc['time_' + key])
+                return bool(participant_assoc.time_entrance)
+        return False
+    
+    def __already_register_hour_leave(self, user, event):
+        for participant_assoc in event.participants:
+            if (participant_assoc.participant.cpf == user.cpf):
+                return bool(participant_assoc.time_leave)
         return False
 
     def update_user_reference(self, user):

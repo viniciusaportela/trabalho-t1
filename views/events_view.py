@@ -76,7 +76,7 @@ class EventsView:
     def __get_organizers_str(self, event):
         str = ''
         for index, organizer in enumerate(event.organizers):
-            str += organizer.name + ' (' + organizer.cpf + ')' + (', ' if index == len(event.organizers) - 1 else '')
+            str += organizer.name + ' (' + organizer.cpf + ')' + (', ' if index != len(event.organizers) - 1 else '')
         return str
 
     def show_find_event(self, headless = False):
@@ -102,7 +102,7 @@ class EventsView:
                 if (datetime):
                     return datetime.strftime('%H:%M')
                 else:
-                    return ''
+                    return 'x'
 
             print(
                 str(index + 1) + 
@@ -112,7 +112,7 @@ class EventsView:
                 participant.cpf + 
                 ')' + 
                 (
-                    ('( ' + get_date_formatted(participant_assoc.time_entrance) + ' -> ' + get_date_formatted(participant_assoc.time_leave)) if (participants_assoc.time_entrance or participants_assoc.time_leave) else ''
+                    (' (' + get_date_formatted(participant_assoc.time_entrance) + ' -> ' + get_date_formatted(participant_assoc.time_leave) + ')') if (participant_assoc.time_entrance or participant_assoc.time_leave) else ''
                 )
             )
         

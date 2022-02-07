@@ -112,3 +112,5 @@ class LocalsController:
 
             if (local):
                 return local
+            else:
+                print('Local nao encontrado!')
