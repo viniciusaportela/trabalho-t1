@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from views.user_view import UserView
 from models.participant_model import Participant
 
@@ -122,6 +122,20 @@ class UsersController:
         )
 
         print('Comprovacao Covid anexada!')
+
+    def can_participant_event(self, user, event):
+        if (not user.has_two_vaccines):
+            if (user.pcr_exam.date == None):
+                return False
+
+            if (user.pcr_exam.has_covid):
+                    return False
+            
+            final_validate = user.pcr_exam.date + timedelta(days=3)
+            if event.datetime < final_validate:
+                return False
+            
+        return True
 
     def open_edit_user(self):
         user = self.open_select_user()

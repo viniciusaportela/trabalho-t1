@@ -62,8 +62,6 @@ class EventsController:
             int(hour_split[1])
         )
         event.datetime = datetime_final
-
-        # self.__events[index] = event
     
     def remove_event(self, title):
         _, index = self.get_event_by_title(title)
@@ -122,9 +120,6 @@ class EventsController:
             print('Voce deveria escolher ao menos um organizador!')
             return
         local = self.__controllers_manager.local.open_select_local()
-
-        print(event)
-        print(event.participants)
 
         self.edit_event(
             event.title,
@@ -239,7 +234,7 @@ class EventsController:
         for participant_assoc in participants:
             participant = participant_assoc.participant
             if (
-                participant.has_two_vaccines == None and participant.pcr_exam.date == None
+                not self.__controllers_manager.user.can_participant_event(participant, event)
             ):
                 participants_without_covid_proof.append(participant_assoc)
         

@@ -1,5 +1,4 @@
 from datetime import datetime
-from models.participant_model import Participant
 from utils.date_validator import validate_date
 from utils.recurring_ask import recurring_ask
 
