@@ -10,7 +10,7 @@ class MainView:
         while True:
             option = int(input('Selecione uma das opcoes: '))
 
-            if (option >= 0 and option <= 3):
+            if (option >= 0 and option <= 4):
                 return option
             else:
                 print('Escolha uma opcao valida!')

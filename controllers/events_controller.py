@@ -1,5 +1,6 @@
 from datetime import datetime
 from models.event_model import Event
+from models.participant_event_model import ParticipantEvent
 from models.participant_model import Participant
 from views.events_view import EventsView
 
@@ -117,8 +118,13 @@ class EventsController:
         user = self.__controllers_manager.user.open_select_user()
         if (user == None):
             return
+        
+        if (not isinstance(user, Participant)):
+            self.__controllers_manager.user.set_covid_status(user.cpf, False, None, None)
 
-        event.participants.append(user)
+        user_event = ParticipantEvent(event, user, None, None)
+
+        event.participants.append(user_event)
 
         self.edit_event(
             event.title,
@@ -169,22 +175,34 @@ class EventsController:
     def open_participants_list(self, event):
         self.view.show_participants_list(event.participants)
 
+    def edit_participant(self, event, participant_cpf, time_entrance = None, time_leave = None):
+        for index, participant_assoc in enumerate(event.participants):
+            if (participant_assoc.participant.cpf == participant_cpf):
+                if (time_entrance):
+                    participant_assoc.time_entrance = time_entrance
+                if (time_leave):
+                    participant_assoc.time_leave = time_leave
+                event.participants[index] = participant_assoc
+
     def open_participants_with_covid_proof(self, event):
         participants = event.participants
         participants_with_covid_proof = []
-        for participant in participants:
+        for participant_assoc in participants:
+            participant = participant_assoc.participant
+
             if (
                 isinstance(participant, Participant) and 
                 (participant.has_two_vaccines or (participant.pcr_exam.date and not participant.pcr_exam.has_covid))
             ):
-                participants_with_covid_proof.append(participant)
+                participants_with_covid_proof.append(participant_assoc)
         
         self.view.show_participants_list(participants_with_covid_proof, '-= Participantes com comprovacao Covid =-')
 
     def open_participants_without_covid_proof(self, event):
         participants = event.participants
         participants_without_covid_proof = []
-        for participant in participants:
+        for participant_assoc in participants:
+            participant = participant_assoc.participant
             if (
                 not isinstance(participant, Participant)
             ):
@@ -193,12 +211,37 @@ class EventsController:
         self.view.show_participants_list(participants_without_covid_proof, '-= Participantes sem comprovacao Covid =-')
 
     def open_register_entrance(self, event):
-        pass
+        print('-= Cadastrar Entrada =-')
+        # TODO after event date
+        # TODO Cant do twice
+        # TODO Has to verify if user is in event participants list
+        # TODO Verify if user has covid test
+        user = self.__controllers_manager.user.open_select_user()
+        if (user == None):
+            return
+        
+        entrance_hour, entrance_minute = self.view.get_hour()
+        entrance_date = datetime(event.datetime.year, event.datetime.month, event.datetime.day, entrance_hour, entrance_minute)
+        
+        self.edit_participant(event, user.cpf, entrance_date)
 
     def open_register_leave(self, event):
-        pass
+        # TODO after event date
+        # TODO Cant do twice
+        # TODO Has to verify if user is in event participants list
+        # TODO Verify if user has covid test
+        print('-= Cadastrar Saida =-')
+        user = self.__controllers_manager.user.open_select_user()
+        if (user == None):
+            return
+        
+        leave_hour, leave_minute = self.view.get_hour()
+        leave_date = datetime(event.datetime.year, event.datetime.month, event.datetime.day, leave_hour, leave_minute)
+        
+        self.edit_participant(event, user.cpf, None, leave_date)
 
     def update_user_reference(self, user):
+        # TODO Test
         for event_index, event in enumerate(self.__events):
             for participant_index, participant in enumerate(event.participants):
                 if (participant.cpf == user.cpf):

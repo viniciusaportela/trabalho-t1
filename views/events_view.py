@@ -77,8 +77,12 @@ class EventsView:
         
         input('Aperte enter para sair... ')
 
-    def show_register_entrance(self):
-        pass
+    def get_hour(self):
+        date_raw = input('Horario de Entrada (H:m): ')
+        date_raw_split = date_raw.split(':')
 
-    def show_register_leave(self):
-        pass
+        hour = int(date_raw_split[0])
+        minute = int(date_raw_split[1])
+
+        hour, minute
+

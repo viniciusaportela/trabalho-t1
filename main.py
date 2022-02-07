@@ -14,7 +14,8 @@ class App:
         
         local, _ = controllers_manager.local.get_local_by_name('Shopping Trindade')
         organizer, _ = controllers_manager.user.get_user_by_cpf('123')
-        controllers_manager.event.add_event('E', 10, local, '01/02/2020 17:30' ,[organizer])
+        controllers_manager.event.add_event('E', 25, local, '01/01/2020 17:30', [organizer])
+        controllers_manager.event.add_event('E2', 10, local, '22/02/2022 17:30', [organizer])
 
     def run(self):
         self.__inject_data()
