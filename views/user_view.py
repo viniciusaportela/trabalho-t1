@@ -1,13 +1,11 @@
 from datetime import datetime
-
 from models.participant_model import Participant
 
 
 class UserView:
     def open_users_menu(self):
-        valid_option = False
-        while not valid_option:
-            print('-= Menu Pessoas =-')
+        while True:
+            print('-----------= Menu Pessoas =-----------')
             print('1 - Cadastrar Pessoa')
             print('2 - Anexar comprovacao covid')
             print('3 - Editar pessoa')
@@ -18,9 +16,11 @@ class UserView:
             option = int(input('Por favor insira uma opcao: '))
             if (option >= 0 and option <= 6):
                 return option
+            else:
+                print('Escolha uma opcao valida!')
 
     def show_register_user(self, edit_mode = False):
-        print('-= Editar Pessoa =-' if edit_mode else '-= Cadastrar Pessoa =-')
+        print('-----------= Editar Pessoa =-----------' if edit_mode else '-----------= Cadastrar Pessoa =-----------')
         name = input('Nome: ')
         cpf = None
         if (not edit_mode):
@@ -34,17 +34,9 @@ class UserView:
         )
         return { "name": name, "cpf": cpf, "birthday": birthday }
 
-    def show_edit_user(self):
-        pass
-
-    def show_edit_user_menu(self):
-        pass
-
-    def show_delete_user(self, user):
-        pass
-
-    def show_find_user(self):
-        print('-= Procurar Pessoa =-')
+    def show_find_user(self, headless = False):
+        if (not headless):
+            print('-----------= Procurar Pessoa =-----------')
         user_cpf = input('Digite o CPF ou 0 para sair: ')
 
         if (user_cpf == '0'):
@@ -53,17 +45,17 @@ class UserView:
         return user_cpf
 
     def show_user_list(self, users):
-        print('-= Lista de Usuarios =-')
+        print('-----------= Lista de Usuarios =-----------')
         for index, user in enumerate(users):
             print(str(index + 1) + ' - ' + user.name + ' (' + user.cpf + ')')
         input('Aperte enter para sair... ')
 
     def show_user_details(self, user):
-        print('-= Usuario =-')
+        print('-----------= Usuario =-----------')
         print('Nome: ' + user.name)
         print('CPF: ' + user.cpf)
         print('Aniversario: ' + user.birthday.strftime("%d/%m/%Y"))
-        print('Endereco: ' + user.address.cep + ', ' + user.address.street + ', ' + user.address.number + ', ' + user.address.complement)
+        print('Endereco: ' + user.address.cep + ', ' + user.address.street + ', n. ' + user.address.number + ', ' + user.address.complement)
 
         if (isinstance(user, Participant)):
             print('Tomou duas doses: ' + ('sim' if user.has_two_vaccines else 'nao'))
@@ -99,5 +91,3 @@ class UserView:
         )
 
         return { "has_two_vaccines": False, "has_covid": has_covid, "pcr_exam_date": pcr_exam_date }
-        
-        

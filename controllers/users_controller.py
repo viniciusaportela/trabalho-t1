@@ -5,9 +5,9 @@ from models.person_model import Person
 
 class UsersController:
     def __init__(self, controllers_manager):
-        self.view = UserView()
         self.__users = []
         self.__controllers_manager = controllers_manager
+        self.view = UserView()
 
     def get_users(self):
         return self.__users
@@ -19,7 +19,10 @@ class UsersController:
         return None, -1
 
     def add_user(self, cpf, name, birthday, cep, street, number, complement, has_two_vaccines = None, has_covid = None, pcr_exam_date = None):
-        # TODO Not duplicated CPF
+        already_has_user, _ = self.get_user_by_cpf(cpf)
+
+        if (already_has_user):
+            return False, 'Esse usuario ja existe!'
 
         user = None
         is_participant = has_two_vaccines != None or (has_covid != None and pcr_exam_date != None)
@@ -29,6 +32,8 @@ class UsersController:
             user = Person(cpf, name, birthday, cep, street, number, complement)
         
         self.__users.append(user)
+
+        return True, ''
 
     def edit_user(self, cpf, name, birthday, cep, street, number, complement):
         user, index = self.get_user_by_cpf(cpf)
@@ -47,13 +52,10 @@ class UsersController:
             if (user.cpf == cpf):
                 self.__users.pop(index)
 
-    def can_participate_event(cpf):
-        pass
-
     def set_covid_status(self, cpf, has_two_vaccines, has_covid, pcr_exam_date):
         user, index = self.get_user_by_cpf(cpf)
 
-        self.__users[index] = Participant(
+        participant = Participant(
             user.cpf,
             user.name,
             user.birthday,
@@ -65,6 +67,9 @@ class UsersController:
             has_covid,
             pcr_exam_date
         )
+
+        self.__users[index] = participant
+        self.__controllers_manager.event.update_user_reference(participant)
 
     def open_user_menu(self):
         bindings = {
@@ -87,7 +92,7 @@ class UsersController:
 
     def open_register_user(self):
         user_data = self.view.show_register_user()
-        address_data = self.__controllers_manager.address.view.view_register_address()
+        address_data = self.__controllers_manager.address.view.show_register_address()
         participant_data = self.view.show_participant_register()
 
         has_two_vaccines = "has_two_vaccines" in participant_data and participant_data["has_two_vaccines"]
@@ -110,7 +115,7 @@ class UsersController:
         print('Usuario adicionado!')
 
     def open_register_participant(self):
-        user = self.__open_select_user()
+        user = self.open_select_user()
         if (user == None):
             return
 
@@ -123,14 +128,14 @@ class UsersController:
         )
 
         print('Comprovacao Covid anexada!')
-    
+
     def open_edit_user(self):
-        user = self.__open_select_user()
+        user = self.open_select_user()
         if (user == None):
             return
 
         user_data = self.view.show_register_user(True)
-        address_data = self.__controllers_manager.address.view.view_register_address()
+        address_data = self.__controllers_manager.address.view.show_register_address()
         self.edit_user(
             user.cpf,
             user_data["name"],
@@ -144,7 +149,7 @@ class UsersController:
         print('Usuario Editado!')
 
     def open_remove_user(self):
-        user = self.__open_select_user()
+        user = self.open_select_user()
         if (user == None):
             return
 
@@ -157,13 +162,13 @@ class UsersController:
         self.view.show_user_list(users)
 
     def open_find_user(self):
-        user = self.__open_select_user()
+        user = self.open_select_user()
         if (user == None):
             return
         
         self.view.show_user_details(user)
 
-    def __open_select_user(self):
+    def open_select_user(self):
         user = None
         while True:
             user_cpf = self.view.show_find_user()
@@ -175,3 +180,5 @@ class UsersController:
 
             if (user):
                 return user
+            else:
+                'Usuario nao encontrado'

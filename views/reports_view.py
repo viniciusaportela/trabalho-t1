@@ -1,12 +1,34 @@
 class ReportsView:
-    def view_reports_menu(self):
-        pass
+    def show_reports_menu(self):
+        while True:
+            print('-----------= Menu Relatorios =-----------')
+            print('1 - Eventos a realizar')
+            print('2 - Ranking de eventos por numero de participantes')
+            print('3 - Eventos ja realizados')
+            print('0 - Voltar')
+            
+            option = int(input('Por favor insira uma opcao: '))
+            
+            if (option >= 0 and option <= 3):
+                return option
+            else:
+                print('Escolha uma opcao valida!')
 
-    def view_soon_events(self):
-        pass
+    def show_report_events(self, events, header = None, with_participants = None):
+        if (header):
+            print(header)
+        else:
+            print('-----------= Eventos =-----------')
 
-    def view_past_events(self):
-        pass
-
-    def view_events_ranking_by_participants(self):
-        pass
+        for index, event in enumerate(events):
+            print(
+                str(index + 1) + 
+                ' - ' + 
+                event.title + 
+                ' (' + 
+                event.local.name +
+                ')' +
+                ((' - ' + str(len(event.participants)) + ' participantes') if with_participants else '')
+            )
+        
+        input('Aperte enter para sair... ')
