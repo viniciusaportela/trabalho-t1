@@ -19,7 +19,7 @@ class UsersController:
         return None, -1
 
     def add_user(self, cpf, name, birthday, cep, street, number, complement, has_two_vaccines = None, has_covid = None, pcr_exam_date = None):
-        already_has_user = self.get_user_by_cpf(cpf)
+        already_has_user, _ = self.get_user_by_cpf(cpf)
 
         if (already_has_user):
             return False, 'Esse usuario ja existe!'
@@ -52,13 +52,10 @@ class UsersController:
             if (user.cpf == cpf):
                 self.__users.pop(index)
 
-    def can_participate_event(cpf):
-        pass
-
     def set_covid_status(self, cpf, has_two_vaccines, has_covid, pcr_exam_date):
         user, index = self.get_user_by_cpf(cpf)
 
-        self.__users[index] = Participant(
+        participant = Participant(
             user.cpf,
             user.name,
             user.birthday,
@@ -70,6 +67,9 @@ class UsersController:
             has_covid,
             pcr_exam_date
         )
+
+        self.__users[index] = participant
+        self.__controllers_manager.event.update_user_reference(participant)
 
     def open_user_menu(self):
         bindings = {
@@ -115,7 +115,7 @@ class UsersController:
         print('Usuario adicionado!')
 
     def open_register_participant(self):
-        user = self.__open_select_user()
+        user = self.open_select_user()
         if (user == None):
             return
 
@@ -128,9 +128,9 @@ class UsersController:
         )
 
         print('Comprovacao Covid anexada!')
-    
+
     def open_edit_user(self):
-        user = self.__open_select_user()
+        user = self.open_select_user()
         if (user == None):
             return
 
@@ -149,7 +149,7 @@ class UsersController:
         print('Usuario Editado!')
 
     def open_remove_user(self):
-        user = self.__open_select_user()
+        user = self.open_select_user()
         if (user == None):
             return
 
@@ -162,13 +162,13 @@ class UsersController:
         self.view.show_user_list(users)
 
     def open_find_user(self):
-        user = self.__open_select_user()
+        user = self.open_select_user()
         if (user == None):
             return
         
         self.view.show_user_details(user)
 
-    def __open_select_user(self):
+    def open_select_user(self):
         user = None
         while True:
             user_cpf = self.view.show_find_user()
@@ -180,3 +180,5 @@ class UsersController:
 
             if (user):
                 return user
+            else:
+                'Usuario nao encontrado'

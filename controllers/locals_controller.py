@@ -94,5 +94,22 @@ class LocalsController:
 
     def open_find_local(self):
         local_name = self.view.show_find_local()
+
+        if (local_name == None):
+            return
+
         local, _ = self.get_local_by_name(local_name)
         self.view.show_local(local)
+    
+    def open_select_local(self):
+        local = None
+        while True:
+            local_name = self.view.show_find_local()
+
+            if local_name == None:
+                return
+
+            local, _ = self.get_local_by_name(local_name)
+
+            if (local):
+                return local

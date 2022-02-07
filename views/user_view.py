@@ -32,8 +32,9 @@ class UserView:
         )
         return { "name": name, "cpf": cpf, "birthday": birthday }
 
-    def show_find_user(self):
-        print('-= Procurar Pessoa =-')
+    def show_find_user(self, headless = False):
+        if (not headless):
+            print('-= Procurar Pessoa =-')
         user_cpf = input('Digite o CPF ou 0 para sair: ')
 
         if (user_cpf == '0'):
