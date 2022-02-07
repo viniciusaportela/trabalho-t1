@@ -8,7 +8,7 @@ class LocalsView:
             print('4 - Listar Locais')
             print('5 - Procurar Local')
             print('0 - Voltar')
-            option = int(input('Por favor insira uma opcao: '))
+            option = int(input('Por favor insira uma opcao: ').strip() or '-1')
             if (option >= 0 and option <= 6):
                 return option
             else:
@@ -22,12 +22,12 @@ class LocalsView:
 
     def show_find_local(self):
         print('-----------= Procurar Local =-----------')
-        option = input('Digite o nome do local ou 0 para sair: ')
+        local = input('Digite o nome do local ou 0 para sair: ')
 
-        if (option == 0):
+        if (local == '0'):
             return None
         
-        return option
+        return local
     
     def show_locals_list(self, locals):
         print('-----------= Locais =-----------')

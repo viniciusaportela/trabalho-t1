@@ -22,14 +22,12 @@ class LocalsController:
         self.__locals.append(local)
     
     def edit_local(self, name, cep, street, number, complement):
-        local, index = self.get_local_by_name(name)
+        local, _ = self.get_local_by_name(name)
         
         local.address.cep = cep
         local.address.street = street
         local.address.number = number
         local.address.complement = complement
-
-        self.__locals[index] = local
 
     def delete_local(self, name):
         _, index = self.get_local_by_name(name)
@@ -93,12 +91,11 @@ class LocalsController:
         self.view.show_locals_list(locals)
 
     def open_find_local(self):
-        local_name = self.view.show_find_local()
+        local = self.open_select_local()
 
-        if (local_name == None):
+        if (local == None):
             return
 
-        local, _ = self.get_local_by_name(local_name)
         self.view.show_local(local)
     
     def open_select_local(self):
@@ -113,3 +110,5 @@ class LocalsController:
 
             if (local):
                 return local
+            else:
+                print('Local nao encontrado!')

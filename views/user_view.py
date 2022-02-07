@@ -1,5 +1,6 @@
 from datetime import datetime
-from models.participant_model import Participant
+from utils.date_validator import validate_date
+from utils.recurring_ask import recurring_ask
 
 
 class UserView:
@@ -7,13 +8,13 @@ class UserView:
         while True:
             print('-----------= Menu Pessoas =-----------')
             print('1 - Cadastrar Pessoa')
-            print('2 - Anexar comprovacao covid')
+            print('2 - Atualizar comprovacao covid')
             print('3 - Editar pessoa')
             print('4 - Deletar pessoa')
             print('5 - Listar Pessoas')
             print('6 - Procurar Pessoa')
             print('0 - Voltar')
-            option = int(input('Por favor insira uma opcao: '))
+            option = int(input('Por favor insira uma opcao: ').strip() or '-1')
             if (option >= 0 and option <= 6):
                 return option
             else:
@@ -25,13 +26,24 @@ class UserView:
         cpf = None
         if (not edit_mode):
             cpf = input('CPF: ')
-        birthday_raw = input('Data Nascimento (dia/mes/ano): ')
-        birthday_raw_split = birthday_raw.split("/")
-        birthday = datetime(
-            int(birthday_raw_split[2]),
-            int(birthday_raw_split[1]),
-            int(birthday_raw_split[0])
-        )
+
+        not_valid = True
+        birthday = None
+        while not_valid:
+            birthday_raw = input('Data Nascimento (dia/mes/ano): ')
+            is_valid = validate_date(birthday_raw)
+
+            if (is_valid):
+                not_valid = False
+                birthday_raw_split = birthday_raw.split("/")
+                birthday = datetime(
+                    int(birthday_raw_split[2]),
+                    int(birthday_raw_split[1]),
+                    int(birthday_raw_split[0])
+                )
+            else:
+                print('Formato de data invalido! Por favor siga o padrao (dia/mes/ano):')
+
         return { "name": name, "cpf": cpf, "birthday": birthday }
 
     def show_find_user(self, headless = False):
@@ -57,8 +69,14 @@ class UserView:
         print('Aniversario: ' + user.birthday.strftime("%d/%m/%Y"))
         print('Endereco: ' + user.address.cep + ', ' + user.address.street + ', n. ' + user.address.number + ', ' + user.address.complement)
 
-        if (isinstance(user, Participant)):
+        if (user.has_two_vaccines == None):
+            print('Tomou duas doses: nao informado')
+        else:
             print('Tomou duas doses: ' + ('sim' if user.has_two_vaccines else 'nao'))
+        
+        if (user.pcr_exam.date == None):
+            print('Exame PCR: nao realizado')
+        else:
             print('Exame PCR: ' + ('positivo' if user.pcr_exam.has_covid else 'negativo'))
         
         input('Aperte enter para sair... ')
@@ -66,12 +84,22 @@ class UserView:
     def show_participant_register(self, skip_first_ask = False):
         has_covid_proof = True
         if (not skip_first_ask):
-            has_covid_proof = input("Tem alguma comprovacao contra covid (s/n)? ").lower() == 's'
+            def ask_has_covid_proof():
+                has_covid_proof = input("Tem alguma comprovacao contra covid (s/n)? ").lower()
+                if (has_covid_proof != 's' and has_covid_proof != 'n'):
+                    return None
+                return has_covid_proof == 's'
+            has_covid_proof = recurring_ask(ask_has_covid_proof)
 
         if not has_covid_proof:
             return { "has_two_vaccines": None, "has_covid": None, "pcr_exam_date": None }
 
-        has_two_vaccines = input('Tomou duas doses (s/n)? ') == 's'
+        def ask_has_covid_proof():
+            has_two_vaccines = input('Tomou duas doses (s/n)? ').lower()
+            if (has_two_vaccines != 's' and has_two_vaccines != 'n'):
+                return None
+            return has_two_vaccines == 's'
+        has_two_vaccines = recurring_ask(ask_has_covid_proof)
 
         if (has_two_vaccines):
             return { "has_two_vaccines": has_two_vaccines, "has_covid": None, "pcr_exam_date": None }
@@ -81,13 +109,26 @@ class UserView:
         if (not has_pcr_test):
             return { "has_two_vaccines": None, "has_covid": None, "pcr_exam_date": None }
 
-        has_covid = input('Qual resultado do exame(positivo/negativo)? ') == 'positivo'
-        pcr_exam_date_raw = input('Qual foi a data do exame (dia/mes/ano)? ')
-        pcr_exam_date_raw_splitted = pcr_exam_date_raw.split("/")
-        pcr_exam_date = datetime(
-            int(pcr_exam_date_raw_splitted[2]),
-            int(pcr_exam_date_raw_splitted[1]),
-            int(pcr_exam_date_raw_splitted[0])
-        )
+        def ask_pcr_exam_has_covid():
+            has_covid = input('Qual resultado do exame(positivo/negativo)? ')
+            if (has_covid != 'positivo' and has_covid != 'negativo'):
+                return None
+            return has_covid == 'positivo'
+        has_covid = recurring_ask(ask_pcr_exam_has_covid)
+
+        def ask_pcr_exam_date():
+            pcr_exam_date_raw = input('Qual foi a data do exame (dia/mes/ano)? ')
+            date_is_valid = validate_date(pcr_exam_date_raw)
+            if (not date_is_valid):
+                return None
+
+            pcr_exam_date_raw_splitted = pcr_exam_date_raw.split("/")
+            pcr_exam_date = datetime(
+                int(pcr_exam_date_raw_splitted[2]),
+                int(pcr_exam_date_raw_splitted[1]),
+                int(pcr_exam_date_raw_splitted[0])
+            )
+            return pcr_exam_date
+        pcr_exam_date = recurring_ask(ask_pcr_exam_date)
 
         return { "has_two_vaccines": False, "has_covid": has_covid, "pcr_exam_date": pcr_exam_date }
