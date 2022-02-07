@@ -9,13 +9,13 @@ class UserView:
         while True:
             print('-----------= Menu Pessoas =-----------')
             print('1 - Cadastrar Pessoa')
-            print('2 - Anexar comprovacao covid')
+            print('2 - Atualizar comprovacao covid')
             print('3 - Editar pessoa')
             print('4 - Deletar pessoa')
             print('5 - Listar Pessoas')
             print('6 - Procurar Pessoa')
             print('0 - Voltar')
-            option = int(input('Por favor insira uma opcao: ') or '-1')
+            option = int(input('Por favor insira uma opcao: ').strip() or '-1')
             if (option >= 0 and option <= 6):
                 return option
             else:
@@ -70,8 +70,14 @@ class UserView:
         print('Aniversario: ' + user.birthday.strftime("%d/%m/%Y"))
         print('Endereco: ' + user.address.cep + ', ' + user.address.street + ', n. ' + user.address.number + ', ' + user.address.complement)
 
-        if (isinstance(user, Participant)):
+        if (user.has_two_vaccines == None):
+            print('Tomou duas doses: nao informado')
+        else:
             print('Tomou duas doses: ' + ('sim' if user.has_two_vaccines else 'nao'))
+        
+        if (user.pcr_exam.date == None):
+            print('Exame PCR: nao realizado')
+        else:
             print('Exame PCR: ' + ('positivo' if user.pcr_exam.has_covid else 'negativo'))
         
         input('Aperte enter para sair... ')

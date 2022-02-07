@@ -52,5 +52,5 @@ class Event:
         return self.__organizers
 
     @organizers.setter
-    def organizers(self, organizers: str):
+    def organizers(self, organizers):
         self.__organizers = organizers

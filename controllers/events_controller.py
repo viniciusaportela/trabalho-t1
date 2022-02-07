@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 from models.event_model import Event
 from models.participant_event_model import ParticipantEvent
-from models.participant_model import Participant
 from views.events_view import EventsView
 
 
@@ -78,8 +77,14 @@ class EventsController:
 
     def open_register_event(self):
         event_data = self.view.show_register_event()
-        print('Selecione o organizador:')
-        organizer = self.__controllers_manager.user.view.show_find_user(True)
+        print('Selecione os organizadores:')
+        organizers = self.__controllers_manager.organizer.open_select_many_organizers()
+        if (organizers == None):
+            return
+        if (len(organizers) == 0):
+            print('Voce deveria escolher ao menos um organizador!')
+            return
+
         local = self.__controllers_manager.local.open_select_local()
 
         self.add_event(
@@ -87,7 +92,7 @@ class EventsController:
             event_data['max_participants'],
             local,
             event_data['event_date'],
-            [organizer]
+            organizers
         )
 
         print('Evento adicionado!')
@@ -98,10 +103,15 @@ class EventsController:
             return
 
         event_data = self.view.show_register_event(True)
-        print('Selecione o organizador:')
-        organizer = self.__controllers_manager.user.view.show_find_user(True)
+        print('Selecione os organizadores:')
+        organizers = self.__controllers_manager.organizer.open_select_many_organizers()
+        if (organizers == None):
+            return
+        if (len(organizers) == 0):
+            print('Voce deveria escolher ao menos um organizador!')
+            return
         local = self.__controllers_manager.local.open_select_local()
-        
+
         self.edit_event(
             event_data["name"],
             event_data["max_participants"],
@@ -128,30 +138,6 @@ class EventsController:
         user = self.__controllers_manager.user.open_select_user()
         if (user == None):
             return
-
-        if (not isinstance(user, Participant)):
-            participant_register = self.__controllers_manager.user.view.show_participant_register()
-
-            if (participant_register['has_two_vaccines'] == None and participant_register['has_covid'] == None):
-                print('O usuario precisa comprovar que nao tem covid antes de participar do evento')
-                return
-            
-            self.__controllers_manager.user.set_covid_status(
-                user.cpf,
-                participant_register['has_two_vaccines'],
-                participant_register['has_covid'],
-                participant_register['pcr_exam_date']
-            )
-
-            if (participant_register['has_two_vaccines'] == False):
-                if (participant_register['has_covid']):
-                    print('O usuario nao pode participar do evento com covid')
-                    return
-
-                final_validate = participant_register['pcr_exam_date'] + timedelta(days=3)
-                if event.datetime < final_validate:
-                    print('A validade do exame do usuario acaba antes do evento ocorrer')
-                    return
 
         user_event = ParticipantEvent(event, user, None, None)
 
@@ -207,7 +193,7 @@ class EventsController:
         participants = []
 
         for participant_assoc in event.participants:
-            participants.append(participant_assoc.participant)
+            participants.append(participant_assoc)
 
         self.view.show_participants_list(participants)
 
@@ -227,10 +213,9 @@ class EventsController:
             participant = participant_assoc.participant
 
             if (
-                isinstance(participant, Participant) and 
-                (participant.has_two_vaccines or (participant.pcr_exam.date and not participant.pcr_exam.has_covid))
+                participant.has_two_vaccines or (participant.pcr_exam.date and not participant.pcr_exam.has_covid)
             ):
-                participants_with_covid_proof.append(participant)
+                participants_with_covid_proof.append(participant_assoc)
         
         self.view.show_participants_list(participants_with_covid_proof, '-----------= Participantes com comprovacao Covid =-----------')
 
@@ -240,9 +225,9 @@ class EventsController:
         for participant_assoc in participants:
             participant = participant_assoc.participant
             if (
-                not isinstance(participant, Participant)
+                participant.has_two_vaccines == None and participant.pcr_exam.date == None
             ):
-                participants_without_covid_proof.append(participant)
+                participants_without_covid_proof.append(participant_assoc)
         
         self.view.show_participants_list(participants_without_covid_proof, '-----------= Participantes sem comprovacao Covid =-----------')
 
@@ -262,6 +247,20 @@ class EventsController:
         if (already_register_entrance):
             print('Esse usuario ja esta no evento!')
             return
+        
+        if (not user.has_two_vaccines):
+            if (user.pcr_exam.date == None):
+                print('O usuario precisa de alguma confirmacao que nao possui covid!')
+                return
+
+            if (user['has_covid']):
+                    print('O usuario nao pode participar do evento com covid')
+                    return
+            
+            final_validate = user['pcr_exam_date'] + timedelta(days=3)
+            if event.datetime < final_validate:
+                print('A validade do exame do usuario acaba antes do evento ocorrer')
+                return
 
         valid_hour = False
         while not valid_hour:

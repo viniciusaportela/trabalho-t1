@@ -13,7 +13,7 @@ class EventsView:
             print('5 - Procurar evento / Manipular evento')
             print('0 - Voltar')
 
-            option = int(input('Selecione uma das opcoes: ') or '-1')
+            option = int(input('Selecione uma das opcoes: ').strip() or '-1')
 
             if (option >= 0 and option <= 5):
                 return option
@@ -56,7 +56,7 @@ class EventsView:
             print('Participantes: ' + str(len(event.participants)) + '/' + str(event.max_participants))
             print('Data: ' + event.datetime.strftime('%d/%m/%Y %H:%M'))
             print('Local: ' + event.local.name)
-            print('Organizador: ' + event.organizers[0].name)
+            print('Organizadores: ' + self.__get_organizers_str(event))
             print('')
             print('1 - Cadastrar Participante')
             print('2 - Listar Participantes')
@@ -66,13 +66,19 @@ class EventsView:
             print('6 - Registrar saida')
             print('0 - Sair')
 
-            option = int(input('Selecione uma das opcoes: ') or '-1')
+            option = int(input('Selecione uma das opcoes: ').strip() or '-1')
 
             if (option >= 0 and option <= 6):
                 return option
             else:
                 print('Escolha uma opcao valida!')
     
+    def __get_organizers_str(self, event):
+        str = ''
+        for index, organizer in enumerate(event.organizers):
+            str += organizer.name + ' (' + organizer.cpf + ')' + (', ' if index == len(event.organizers) - 1 else '')
+        return str
+
     def show_find_event(self, headless = False):
         if (not headless):
             print('-----------= Procurar Evento =-----------')
@@ -82,7 +88,7 @@ class EventsView:
             return None
 
         return local_name
-    
+
     def show_participants_list(self, participants_assoc, custom_header = None):
         if (custom_header):
             print(custom_header)

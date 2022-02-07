@@ -7,7 +7,7 @@ class ReportsView:
             print('3 - Eventos ja realizados')
             print('0 - Voltar')
             
-            option = int(input('Por favor insira uma opcao: ') or '-1')
+            option = int(input('Por favor insira uma opcao: ').strip() or '-1')
             
             if (option >= 0 and option <= 3):
                 return option

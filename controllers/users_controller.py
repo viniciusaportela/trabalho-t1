@@ -1,7 +1,6 @@
 from datetime import datetime
 from views.user_view import UserView
 from models.participant_model import Participant
-from models.person_model import Person
 
 
 class UsersController:
@@ -25,13 +24,7 @@ class UsersController:
         if (already_has_user):
             return False, 'Esse usuario ja existe!'
 
-        user = None
-        is_participant = has_two_vaccines != None or (has_covid != None and pcr_exam_date != None)
-        if (is_participant):
-            user = Participant(cpf, name, birthday, cep, street, number, complement, has_two_vaccines, has_covid, pcr_exam_date)
-        else:
-            user = Person(cpf, name, birthday, cep, street, number, complement)
-        
+        user = Participant(cpf, name, birthday, cep, street, number, complement, has_two_vaccines, has_covid, pcr_exam_date)
         self.__users.append(user)
 
         return True, ''
@@ -56,33 +49,11 @@ class UsersController:
     def set_covid_status(self, cpf, has_two_vaccines, has_covid, pcr_exam_date):
         user, index = self.get_user_by_cpf(cpf)
 
-        participant = Participant(
-            user.cpf,
-            user.name,
-            user.birthday,
-            user.address.cep,
-            user.address.street,
-            user.address.number,
-            user.address.complement,
-            has_two_vaccines,
-            has_covid,
-            pcr_exam_date
-        )
+        user.has_two_vaccines = has_two_vaccines
+        user.pcr_exam.date = pcr_exam_date
+        user.pcr_exam.has_covid = has_covid
 
-        self.__users[index] = participant
-        self.__controllers_manager.event.update_user_reference(participant)
-
-    def can_participante_event(self, cpf):
-        user = self.get_user_by_cpf(cpf)
-        is_participant = isinstance(user, Participant)
-        
-        if (not is_participant):
-            return False
-        
-        if (not user.has_two_vaccines and (not user.pcr_exam.date or user.pcr_exam.has_covid)):
-            return False
-        
-        return True
+        self.__users[index] = user
 
     def open_user_menu(self):
         bindings = {
@@ -105,6 +76,12 @@ class UsersController:
 
     def open_register_user(self):
         user_data = self.view.show_register_user()
+
+        already_has_user, _ = self.get_user_by_cpf(user_data['cpf'])
+        if (already_has_user != None):
+            print('Esse CPF ja foi cadastrado!')
+            return
+
         address_data = self.__controllers_manager.address.view.show_register_address()
         participant_data = self.view.show_participant_register()
 
@@ -200,4 +177,4 @@ class UsersController:
             if (user):
                 return user
             else:
-                'Usuario nao encontrado'
+                print('Usuario nao encontrado')
