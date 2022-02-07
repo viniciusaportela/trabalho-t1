@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime as date, timedelta
 from models.event_model import Event
 from models.participant_event_model import ParticipantEvent
 from views.events_view import EventsView
@@ -29,7 +29,7 @@ class EventsController:
         date_split = date_time_split[0].split('/')
         hour_split = date_time_split[1].split(':')
 
-        datetime_str = datetime(
+        datetime_str = date(
             int(date_split[2]),
             int(date_split[1]),
             int(date_split[0]),
@@ -44,15 +44,26 @@ class EventsController:
         return True, ''
 
     def edit_event(self, title, max_participants, participants, local, datetime, organizers):
-        event, index = self.get_event_by_title(title)
+        event, _ = self.get_event_by_title(title)
 
         event.max_participants = max_participants
         event.local = local
         event.participants = participants
-        event.datetime = datetime
         event.organizers = organizers
 
-        self.__events[index] = event
+        date_time_split = datetime.split(' ')
+        date_split = date_time_split[0].split('/')
+        hour_split = date_time_split[1].split(':')
+        datetime_final = date(
+            int(date_split[2]),
+            int(date_split[1]),
+            int(date_split[0]),
+            int(hour_split[0]),
+            int(hour_split[1])
+        )
+        event.datetime = datetime_final
+
+        # self.__events[index] = event
     
     def remove_event(self, title):
         _, index = self.get_event_by_title(title)
@@ -112,8 +123,11 @@ class EventsController:
             return
         local = self.__controllers_manager.local.open_select_local()
 
+        print(event)
+        print(event.participants)
+
         self.edit_event(
-            event_data["name"],
+            event.title,
             event_data["max_participants"],
             event.participants,
             local,
@@ -126,7 +140,7 @@ class EventsController:
     def open_add_participant_to_event(self, event):
         print('-----------= Cadastrar pessoa em evento =-----------')
 
-        current = datetime.now()
+        current = date.now()
         if (event.datetime <= current):
             print('Esse evento ja finalizou!')
             return
@@ -148,7 +162,7 @@ class EventsController:
             event.max_participants,
             event.participants,
             event.local,
-            event.datetime,
+            event.datetime.strftime('%d/%m/%Y %H:%M'),
             event.organizers
         )
 
@@ -265,7 +279,7 @@ class EventsController:
         valid_hour = False
         while not valid_hour:
             entrance_hour, entrance_minute = self.view.get_hour()
-            entrance_date = datetime(event.datetime.year, event.datetime.month, event.datetime.day, entrance_hour, entrance_minute)
+            entrance_date = date(event.datetime.year, event.datetime.month, event.datetime.day, entrance_hour, entrance_minute)
 
             if (entrance_date >= event.datetime):
                 valid_hour = True
@@ -301,7 +315,7 @@ class EventsController:
         entrance_hour = self.__get_participant_assoc_hour_entrance(user, event)
         while not valid_hour:
             leave_hour, leave_minute = self.view.get_hour()
-            leave_date = datetime(event.datetime.year, event.datetime.month, event.datetime.day, leave_hour, leave_minute)
+            leave_date = date(event.datetime.year, event.datetime.month, event.datetime.day, leave_hour, leave_minute)
 
             if (leave_date >= entrance_hour):
                 valid_hour = True

@@ -22,14 +22,12 @@ class LocalsController:
         self.__locals.append(local)
     
     def edit_local(self, name, cep, street, number, complement):
-        local, index = self.get_local_by_name(name)
+        local, _ = self.get_local_by_name(name)
         
         local.address.cep = cep
         local.address.street = street
         local.address.number = number
         local.address.complement = complement
-
-        self.__locals[index] = local
 
     def delete_local(self, name):
         _, index = self.get_local_by_name(name)

@@ -20,9 +20,11 @@ class EventsView:
             else:
                 print('Escolha uma opcao valida!')
 
-    def show_register_event(self):
-        print('-----------= Registrar Evento =-----------')
-        name = input('Nome: ')
+    def show_register_event(self, edit_mode = False):
+        print('-----------= Editar Evento =-----------' if edit_mode else '-----------= Registrar Evento =-----------')
+        name = None
+        if (not edit_mode):
+            name = input('Nome: ')
         
         def ask_max_participants():
             max_participants = input('Max Participantes: ')

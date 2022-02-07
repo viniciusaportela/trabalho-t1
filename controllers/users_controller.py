@@ -30,7 +30,7 @@ class UsersController:
         return True, ''
 
     def edit_user(self, cpf, name, birthday, cep, street, number, complement):
-        user, index = self.get_user_by_cpf(cpf)
+        user, _ = self.get_user_by_cpf(cpf)
 
         user.name = name
         user.birthday = birthday
@@ -38,8 +38,6 @@ class UsersController:
         user.address.street = street
         user.address.number = number
         user.address.complement = complement
-
-        self.__users[index] = user
 
     def remove_user(self, cpf):
         for index, user in enumerate(self.__users):
